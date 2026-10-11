@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Empire Tycoon</title>
+<style>
+:root{
+  --bg:#0b1020; --bg2:#111a30; --card:#16213d; --card2:#1c2a4d;
+  --accent:#22e584; --accent2:#ffd23e; --danger:#ff5d5d;
+  --text:#eef3ff; --dim:#8b98b8; --line:#26345c;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  min-height:100vh; overscroll-behavior-y:none;}
+body{max-width:560px;margin:0 auto;padding-bottom:96px;}
+header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,#0d1430,#0b1020f2);
+  padding:14px 16px 10px;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);}
+.cash{font-size:34px;font-weight:800;color:var(--accent2);letter-spacing:-.5px;line-height:1.1;}
+.sub{display:flex;gap:14px;color:var(--dim);font-size:13px;margin-top:4px;}
+.sub b{color:var(--text);font-weight:700;}
+#hustleWrap{padding:16px 16px 6px;position:relative;}
+#hustle{width:100%;padding:26px 0;font-size:24px;font-weight:800;color:#062b1a;
+  background:linear-gradient(180deg,#3ff59b,#1ccb74);border:none;border-radius:20px;
+  box-shadow:0 6px 0 #0e8a4c,0 10px 24px #22e58444;cursor:pointer;user-select:none;
+  touch-action:manipulation;transition:transform .05s;}
+#hustle:active{transform:translateY(4px) scale(.99);box-shadow:0 2px 0 #0e8a4c;}
+#hustle small{display:block;font-size:13px;font-weight:600;color:#062b1acc;margin-top:4px;}
+.float{position:absolute;font-weight:800;color:var(--accent2);pointer-events:none;
+  animation:floatUp 1s ease-out forwards;font-size:18px;text-shadow:0 2px 8px #000;z-index:60;}
+@keyframes floatUp{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(-70px);}}
+.tabs{position:fixed;bottom:0;left:0;right:0;z-index:50;background:#0d1430f5;
+  border-top:1px solid var(--line);display:flex;backdrop-filter:blur(8px);
+  padding-bottom:env(safe-area-inset-bottom);}
+.tabs button{flex:1;background:none;border:none;color:var(--dim);font-size:11px;
+  padding:10px 0 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.tabs button .ico{font-size:22px;}
+.tabs button.active{color:var(--accent);}
+main{padding:4px 12px 12px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:12px;margin:10px 0;display:flex;gap:12px;align-items:center;position:relative;overflow:hidden;}
+.card.locked{opacity:.55;}
+.bizIcon{font-size:38px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;
+  background:var(--bg2);border-radius:14px;flex-shrink:0;}
+.bizInfo{flex:1;min-width:0;}
+.bizName{font-weight:700;font-size:15px;}
+.bizMeta{font-size:12px;color:var(--dim);margin-top:2px;}
+.mileBar{height:6px;background:var(--bg2);border-radius:3px;margin-top:6px;overflow:hidden;}
+.mileBar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7dffc4);border-radius:3px;transition:width .3s;}
+.buyBtn{background:var(--accent);border:none;color:#062b1a;font-weight:800;font-size:14px;
+  border-radius:12px;padding:12px 10px;min-width:96px;cursor:pointer;user-select:none;touch-action:manipulation;}
+.buyBtn small{display:block;font-size:11px;font-weight:600;opacity:.75;}
+.buyBtn.cant{background:#2a3a63;color:var(--dim);cursor:default;}
+.buyBtn:active:not(.cant){transform:scale(.96);}
+.countBadge{position:absolute;top:8px;right:10px;font-size:12px;font-weight:800;color:var(--accent2);}
+.toolbar{display:flex;gap:8px;margin:10px 2px;align-items:center;}
+.toolbar .lbl{font-size:12px;color:var(--dim);}
+.seg{display:flex;background:var(--bg2);border-radius:10px;overflow:hidden;border:1px solid var(--line);}
+.seg button{background:none;border:none;color:var(--dim);padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;}
+.seg button.on{background:var(--accent);color:#062b1a;}
+.ach{opacity:1;}
+.ach.lockedA{opacity:.45;filter:grayscale(.8);}
+.achIcon{font-size:30px;}
+.bonusTag{font-size:11px;color:var(--accent);font-weight:700;}
+.modal{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.modalBox{background:var(--card2);border:1px solid var(--line);border-radius:20px;padding:24px;max-width:380px;width:100%;text-align:center;}
+.modalBox h2{margin:0 0 8px;}
+.modalBox p{color:var(--dim);font-size:14px;}
+.modalBox .big{font-size:32px;font-weight:800;color:var(--accent2);margin:10px 0;}
+.btnRow{display:flex;gap:10px;margin-top:16px;}
+.btnRow button{flex:1;padding:14px;border-radius:12px;border:none;font-weight:800;font-size:15px;cursor:pointer;}
+.primary{background:var(--accent);color:#062b1a;}
+.ghost{background:var(--bg2);color:var(--text);border:1px solid var(--line);}
+.statRow{display:flex;justify-content:space-between;padding:10px 4px;border-bottom:1px solid var(--line);font-size:14px;}
+.statRow span:first-child{color:var(--dim);}
+.starBar{height:10px;background:var(--bg2);border-radius:5px;overflow:hidden;margin:8px 0;}
+.starBar i{display:block;height:100%;background:linear-gradient(90deg,#ffd23e,#ff9a3e);}
+.dangerBtn{width:100%;margin-top:14px;background:none;border:1px solid var(--danger);color:var(--danger);
+  padding:12px;border-radius:12px;font-weight:700;cursor:pointer;}
+.muteBtn{position:absolute;top:12px;right:14px;background:var(--bg2);border:1px solid var(--line);
+  color:var(--text);border-radius:10px;padding:6px 10px;font-size:14px;cursor:pointer;}
+.hidden{display:none!important;}
+.confetti{position:fixed;font-size:24px;pointer-events:none;z-index:200;animation:confFall 1.4s ease-in forwards;}
+@keyframes confFall{to{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+.toast{position:fixed;top:76px;left:50%;transform:translateX(-50%);background:var(--card2);
+  border:1px solid var(--accent);color:var(--text);padding:10px 18px;border-radius:30px;
+  font-size:14px;font-weight:700;z-index:150;animation:toastIn .3s ease-out;white-space:nowrap;}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,-10px);}to{opacity:1;transform:translate(-50%,0);}}
+h3.sec{margin:16px 4px 2px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);}
+.emptyNote{text-align:center;color:var(--dim);padding:30px 10px;font-size:14px;}
+</style>
+</head>
+<body>
+<header>
+  <button class="muteBtn" id="muteBtn" title="Sound on/off">🔊</button>
+  <div class="cash" id="cash">$0</div>
+  <div class="sub">
+    <span>📈 <b id="perSec">$0</b>/s</span>
+    <span>👆 <b id="perTap">$1</b>/tap</span>
+    <span>⭐ <b id="starCount">0</b></span>
+  </div>
+</header>
+
+<div id="hustleWrap">
+  <button id="hustle">HUSTLE<small>tap to earn</small></button>
+</div>
+
+<main id="view"></main>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="biz" class="active"><span class="ico">🏪</span>Businesses</button>
+  <button data-tab="upg"><span class="ico">⬆️</span>Upgrades</button>
+  <button data-tab="ach"><span class="ico">🏆</span>Trophies</button>
+  <button data-tab="emp"><span class="ico">🌐</span>Empire</button>
+</nav>
+
+<div class="modal hidden" id="modal"><div class="modalBox" id="modalBox"></div></div>
+
+<script>
+'use strict';
+/* ================= DATA ================= */
+const GROWTH = 1.15;
+const MILESTONES = [10, 25, 50, 100, 200, 300];
+const BUSINESSES = [
+  {id:'lemonade',   name:'Lemonade Stand', icon:'🍋', cost:15,           income:0.1},
+  {id:'foodtruck',  name:'Food Truck',     icon:'🌮', cost:120,          income:1},
+  {id:'coffee',     name:'Coffee Shop',    icon:'☕', cost:1100,         income:8},
+  {id:'carwash',    name:'Car Wash',       icon:'🚗', cost:11000,        income:50},
+  {id:'restaurant', name:'Restaurant',     icon:'🍔', cost:130000,       income:400},
+  {id:'boutique',   name:'Boutique',       icon:'👕', cost:1400000,      income:3000},
+  {id:'cinema',     name:'Cinema',         icon:'🎬', cost:20000000,     income:30000},
+  {id:'hotel',      name:'Hotel',          icon:'🏨', cost:330000000,    income:350000},
+  {id:'airline',    name:'Airline',        icon:'✈️', cost:5200000000,   income:4000000},
+  {id:'rocket',     name:'Rocket Co',      icon:'🚀', cost:88000000000,  income:60000000},
+];
+const UPGRADES = [];
+BUSINESSES.forEach(b => {
+  const tiers = [
+    {req:5,   cm:20,   n:'I'},
+    {req:25,  cm:200,  n:'II'},
+    {req:100, cm:2000, n:'III'},
+  ];
+  tiers.forEach((t,i) => UPGRADES.push({
+    id:b.id+'_u'+i, kind:'biz', biz:b.id, req:t.req,
+    cost:b.cost*t.cm, mult:3,
+    name:b.icon+' '+b.name+' '+t.n, desc:b.name+' income ×3'
+  }));
+});
+[
+  {id:'tap1', kind:'tap', cost:500,     mult:3,    name:'👆 Golden Touch',   desc:'Tap earnings ×3'},
+  {id:'tap2', kind:'tap', cost:50000,   mult:3,    name:'👆 Diamond Touch',   desc:'Tap earnings ×3'},
+  {id:'tap3', kind:'tap', cost:5000000, mult:3,    name:'👆 Midas Touch',     desc:'Tap earnings ×3'},
+  {id:'all1', kind:'all', cost:2000,    mult:1.25, name:'📈 Marketing Blitz', desc:'All income +25%'},
+  {id:'all2', kind:'all', cost:200000,  mult:1.25, name:'📈 Brand Empire',    desc:'All income +25%'},
+  {id:'all3', kind:'all', cost:20000000,mult:1.25, name:'📈 Global Reach',    desc:'All income +25%'},
+].forEach(u => UPGRADES.push(u));
+
+const ACH = [
+  {id:'e1', icon:'💵', name:'First Grand',    desc:'Earn $1K all time',      t:s=>s.lifetime>=1e3},
+  {id:'e2', icon:'💰', name:'Hundredaire',    desc:'Earn $100K all time',    t:s=>s.lifetime>=1e5},
+  {id:'e3', icon:'🤑', name:'Millionaire',    desc:'Earn $1M all time',      t:s=>s.lifetime>=1e6},
+  {id:'e4', icon:'💎', name:'Tycoon',         desc:'Earn $100M all time',    t:s=>s.lifetime>=1e8},
+  {id:'e5', icon:'🏦', name:'Mogul',          desc:'Earn $10B all time',     t:s=>s.lifetime>=1e10},
+  {id:'e6', icon:'🌍', name:'Magnate',        desc:'Earn $1T all time',      t:s=>s.lifetime>=1e12},
+  {id:'t1', icon:'👆', name:'Warm-Up',        desc:'Tap 100 times',          t:s=>s.taps>=100},
+  {id:'t2', icon:'💪', name:'Hustler',        desc:'Tap 5,000 times',        t:s=>s.taps>=5000},
+  {id:'t3', icon:'⚡', name:'Tap Legend',     desc:'Tap 100,000 times',      t:s=>s.taps>=100000},
+  {id:'o1', icon:'🏪', name:'Shopkeeper',     desc:'Own 10 businesses',      t:s=>totalOwned()>=10},
+  {id:'o2', icon:'🏬', name:'Chain Owner',    desc:'Own 100 businesses',     t:s=>totalOwned()>=100},
+  {id:'o3', icon:'🏙️', name:'Conglomerate',   desc:'Own 1,000 businesses',   t:s=>totalOwned()>=1000},
+  {id:'p1', icon:'🔄', name:'Fresh Start',    desc:'Rebrand once',           t:s=>s.rebrands>=1},
+  {id:'p2', icon:'🌐', name:'Serial Founder', desc:'Rebrand 5 times',        t:s=>s.rebrands>=5},
+];
+
+/* ================= STATE ================= */
+const SAVE_KEY = 'empireTycoonV1';
+function defaultState(){
+  return {cash:0, lifetime:0, lifetimeRun:0, owned:{}, upg:{}, ach:{},
+          stars:0, taps:0, rebrands:0, playTime:0,
+          lastSeen:Date.now(), muted:false, buyMode:1, tab:'biz'};
+}
+let S = defaultState();
+function save(){ S.lastSeen = Date.now(); try{ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
+function load(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return;
+    const d = JSON.parse(raw);
+    S = Object.assign(defaultState(), d);
+  }catch(e){}
+}
+
+/* ================= ECONOMY ================= */
+const UNITS = ['', 'K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc'];
+function fmt(n){
+  if(!isFinite(n)) return '∞';
+  if(n < 1000){
+    if(n < 10 && n % 1 !== 0) return n.toFixed(1);
+    return Math.floor(n).toString();
+  }
+  let u = 0;
+  while(n >= 1000 && u < UNITS.length-1){ n /= 1000; u++; }
+  return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + UNITS[u];
+}
+const $fmt = n => '$' + fmt(n);
+function totalOwned(){ return BUSINESSES.reduce((a,b)=>a+(S.owned[b.id]||0), 0); }
+function achCount(){ return Object.keys(S.ach).length; }
+function achMult(){ return 1 + 0.02 * achCount(); }
+function starMult(){ return 1 + 0.03 * S.stars; }
+function allMult(){ return UPGRADES.filter(u=>u.kind==='all' && S.upg[u.id]).reduce((a,u)=>a*u.mult, 1); }
+function tapUpgMult(){ return UPGRADES.filter(u=>u.kind==='tap' && S.upg[u.id]).reduce((a,u)=>a*u.mult, 1); }
+function milestoneMult(owned){
+  let m = 1;
+  for(const t of MILESTONES) if(owned >= t) m *= 2;
+  return m;
+}
+function bizUpgMult(bizId){
+  return UPGRADES.filter(u=>u.kind==='biz' && u.biz===bizId && S.upg[u.id])
+                 .reduce((a,u)=>a*u.mult, 1);
+}
+function bizIncome(b){
+  const o = S.owned[b.id] || 0;
+  if(!o) return 0;
+  return b.income * o * milestoneMult(o) * bizUpgMult(b.id) * allMult() * achMult() * starMult();
+}
+function perSec(){ return BUSINESSES.reduce((a,b)=>a+bizIncome(b), 0); }
+function perTap(){ return (1 + perSec()/20) * tapUpgMult() * allMult() * achMult() * starMult(); }
+function bizCost(b, n){
+  const o = S.owned[b.id] || 0;
+  return Math.ceil(b.cost * Math.pow(GROWTH, o) * (Math.pow(GROWTH, n)-1) / (GROWTH-1));
+}
+function maxAffordable(b){
+  const o = S.owned[b.id] || 0;
+  const cur = b.cost * Math.pow(GROWTH, o);
+  if(S.cash < cur) return 0;
+  return Math.max(1, Math.floor(Math.log(1 + S.cash*(GROWTH-1)/cur) / Math.log(GROWTH)));
+}
+function buyQty(b){
+  if(S.buyMode === 'max') return maxAffordable(b);
+  return S.buyMode;
+}
+function isUnlocked(b){
+  return (S.owned[b.id]||0) > 0 || S.lifetime >= b.cost * 0.1;
+}
+function nextMilestone(owned){
+  for(const t of MILESTONES) if(owned < t) return t;
+  return null;
+}
+function earnableStars(){
+  if(S.lifetimeRun < 1e12) return 0;
+  return Math.floor(150 * Math.sqrt(S.lifetimeRun / 1e12));
+}
+
+/* ================= SOUND ================= */
+let AC = null;
+function beep(freq, dur, when){
+  if(S.muted) return;
+  try{
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.connect(g); g.connect(AC.destination);
+    o.frequency.value = freq; o.type = 'sine';
+    const t = AC.currentTime + (when||0);
+    g.gain.setValueAtTime(0.12, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.start(t); o.stop(t + dur);
+  }catch(e){}
+}
+const sndTap = () => beep(600 + Math.random()*200, 0.06);
+const sndBuy = () => { beep(520, .08); beep(780, .1, .07); };
+const sndWin = () => { beep(523,.12); beep(659,.12,.1); beep(784,.2,.2); };
+
+/* ================= ACTIONS ================= */
+function addCash(n){ S.cash += n; S.lifetime += n; S.lifetimeRun += n; }
+function doTap(x, y){
+  const v = perTap();
+  addCash(v); S.taps++;
+  sndTap();
+  const w = document.getElementById('hustleWrap');
+  const f = document.createElement('div');
+  f.className = 'float'; f.textContent = '+' + $fmt(v);
+  f.style.left = (x != null ? x : 40 + Math.random()*60) + 'px';
+  f.style.top = (y != null ? y : 30) + 'px';
+  w.appendChild(f);
+  setTimeout(()=>f.remove(), 1000);
+  updateHeader();
+}
+function buyBusiness(id){
+  const b = BUSINESSES.find(x=>x.id===id);
+  const q = buyQty(b);
+  if(q < 1) return;
+  const c = bizCost(b, q);
+  if(S.cash < c) return;
+  const first = !(S.owned[id] > 0);
+  S.cash -= c;
+  const before = S.owned[id] || 0;
+  S.owned[id] = before + q;
+  sndBuy();
+  if(first){ confetti(); toast(b.icon + ' New business: ' + b.name + '!'); }
+  const after = S.owned[id];
+  if(MILESTONES.includes(after)){
+    sndWin(); confetti();
+    toast('🎉 ' + b.name + ' milestone: ' + after + ' owned — income ×2!');
+  }
+  save(); render();
+}
+function buyUpgrade(id){
+  const u = UPGRADES.find(x=>x.id===id);
+  if(!u || S.upg[id] || S.cash < u.cost) return;
+  S.cash -= u.cost; S.upg[id] = 1;
+  sndBuy(); toast('⬆️ ' + u.name + ' purchased!');
+  save(); render();
+}
+function checkAch(){
+  let changed = false;
+  for(const a of ACH){
+    if(!S.ach[a.id] && a.t(S)){
+      S.ach[a.id] = 1; changed = true;
+      sndWin(); confetti();
+      toast(a.icon + ' Trophy: ' + a.name + ' (+2% income)');
+    }
+  }
+  if(changed) save();
+}
+function doRebrand(){
+  const n = earnableStars();
+  if(n < 1) return;
+  showModal(
+    '<h2>🌐 Rebrand</h2><p>Start over with a fresh company and gain</p>' +
+    '<div class="big">⭐ +' + n + ' Franchise Stars</div>' +
+    '<p>Each star = +3% income forever. Cash, businesses and upgrades reset. Trophies and stars are kept.</p>',
+    [{label:'Rebrand', cls:'primary', fn:()=>{
+      S.stars += n; S.rebrands++;
+      S.cash = 0; S.lifetimeRun = 0; S.owned = {}; S.upg = {};
+      sndWin(); confetti(); save(); render();
+      toast('🌐 Rebranded! +' + n + ' stars');
+    }},
+    {label:'Not yet', cls:'ghost', fn:null}]
+  );
+}
+function hardReset(){
+  showModal('<h2>⚠️ Reset everything?</h2><p>This wipes ALL progress, trophies and stars. There is no undo.</p>',
+    [{label:'Wipe it all', cls:'primary', fn:()=>{
+      try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+      S = defaultState(); save(); render();
+    }},
+    {label:'Cancel', cls:'ghost', fn:null}]);
+}
+
+/* ================= FX ================= */
+function confetti(){
+  const icons = ['🎉','⭐','💵','🚀','✨'];
+  for(let i=0;i<24;i++){
+    const d = document.createElement('div');
+    d.className = 'confetti';
+    d.textContent = icons[Math.floor(Math.random()*icons.length)];
+    d.style.left = Math.random()*100 + 'vw';
+    d.style.top = '-30px';
+    d.style.animationDelay = (Math.random()*0.4) + 's';
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(), 2200);
+  }
+}
+let toastTimer = null;
+function toast(msg){
+  const old = document.querySelector('.toast');
+  if(old) old.remove();
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.remove(), 2600);
+}
+function showModal(html, buttons){
+  const m = document.getElementById('modal');
+  const box = document.getElementById('modalBox');
+  box.innerHTML = html;
+  const row = document.createElement('div');
+  row.className = 'btnRow';
+  buttons.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = b.cls; btn.textContent = b.label;
+    btn.onclick = () => { m.classList.add('hidden'); if(b.fn) b.fn(); };
+    row.appendChild(btn);
+  });
+  box.appendChild(row);
+  m.classList.remove('hidden');
+}
+
+/* ================= RENDER ================= */
+function updateHeader(){
+  document.getElementById('cash').textContent = $fmt(S.cash);
+  document.getElementById('perSec').textContent = $fmt(perSec());
+  document.getElementById('perTap').textContent = $fmt(perTap());
+  document.getElementById('starCount').textContent = S.stars;
+}
+function renderBiz(){
+  let h = '<div class="toolbar"><span class="lbl">Buy:</span><div class="seg">' +
+    [1,10,'max'].map(m =>
+      '<button data-buymode="' + m + '" class="' + (S.buyMode===m?'on':'') + '">' +
+      (m==='max' ? 'Max' : 'x'+m) + '</button>').join('') +
+    '</div></div>';
+  BUSINESSES.forEach(b => {
+    const owned = S.owned[b.id] || 0;
+    if(!isUnlocked(b)){
+      h += '<div class="card locked"><div class="bizIcon">❓</div><div class="bizInfo">' +
+           '<div class="bizName">???</div><div class="bizMeta">Earn ' + $fmt(b.cost*0.1) +
+           ' total to discover</div></div></div>';
+      return;
+    }
+    const q = buyQty(b), cost = bizCost(b, Math.max(1,q));
+    const afford = S.cash >= cost && q >= 1;
+    const inc = bizIncome(b);
+    const nm = nextMilestone(owned);
+    const pct = nm ? Math.min(100, owned/nm*100) : 100;
+    h += '<div class="card">' +
+      '<div class="bizIcon">' + b.icon + '</div>' +
+      '<div class="bizInfo"><div class="bizName">' + b.name + '</div>' +
+      '<div class="bizMeta">' + (owned ? $fmt(inc) + '/s' : $fmt(b.income*allMult()*achMult()*starMult()) + '/s each') +
+      ' · ' + (nm ? owned + '/' + nm + ' to ×2' : 'MAX milestone') + '</div>' +
+      '<div class="mileBar"><i style="width:' + pct + '%"></i></div></div>' +
+      '<button class="buyBtn' + (afford?'':' cant') + '" data-buy="' + b.id + '">' +
+      (q==='max'||S.buyMode==='max' ? 'Buy ' + (q||'') : 'Buy x' + q) +
+      '<small>' + $fmt(cost) + '</small></button>' +
+      (owned ? '<div class="countBadge">' + owned + '</div>' : '') +
+      '</div>';
+  });
+  document.getElementById('view').innerHTML = h;
+}
+function renderUpg(){
+  const avail = UPGRADES.filter(u => {
+    if(S.upg[u.id]) return false;
+    if(u.kind === 'biz') return (S.owned[u.biz]||0) >= u.req;
+    return true;
+  }).sort((a,b) => a.cost - b.cost);
+  if(!avail.length){
+    document.getElementById('view').innerHTML =
+      '<div class="emptyNote">🎉 All upgrades purchased!<br>Check back after you unlock more businesses.</div>';
+    return;
+  }
+  let h = '<h3 class="sec">Available upgrades</h3>';
+  avail.forEach(u => {
+    const afford = S.cash >= u.cost;
+    h += '<div class="card"><div class="bizIcon">⬆️</div>' +
+      '<div class="bizInfo"><div class="bizName">' + u.name + '</div>' +
+      '<div class="bizMeta">' + u.desc +
+      (u.kind==='biz' ? ' · own ' + u.req + ' ' + BUSINESSES.find(b=>b.id===u.biz).name + 's' : '') +
+      '</div></div>' +
+      '<button class="buyBtn' + (afford?'':' cant') + '" data-upg="' + u.id + '">Buy<small>' +
+      $fmt(u.cost) + '</small></button></div>';
+  });
+  document.getElementById('view').innerHTML = h;
+}
+function renderAch(){
+  let h = '<h3 class="sec">Trophies <span class="bonusTag">(+2% income each)</span></h3>';
+  ACH.forEach(a => {
+    const got = !!S.ach[a.id];
+    h += '<div class="card ach' + (got?'':' lockedA') + '"><div class="achIcon">' +
+      (got ? a.icon : '🔒') + '</div><div class="bizInfo"><div class="bizName">' +
+      a.name + '</div><div class="bizMeta">' + a.desc + '</div></div>' +
+      (got ? '<div class="bonusTag">+2% ✓</div>' : '') + '</div>';
+  });
+  document.getElementById('view').innerHTML = h;
+}
+function renderEmp(){
+  const n = earnableStars();
+  const nextAt = 1e12;
+  const pct = Math.min(100, S.lifetimeRun / nextAt * 100);
+  let h = '<h3 class="sec">Rebrand (prestige)</h3>' +
+    '<div class="card"><div class="bizIcon">🌐</div><div class="bizInfo">' +
+    '<div class="bizName">Franchise Stars: ⭐ ' + S.stars + '</div>' +
+    '<div class="bizMeta">Each star = +3% income forever</div>' +
+    '<div class="starBar"><i style="width:' + pct + '%"></i></div>' +
+    '<div class="bizMeta">' + (n >= 1
+      ? 'Ready! Rebrand now for <b>+' + n + ' stars</b>'
+      : 'Earn ' + $fmt(nextAt) + ' this run to earn stars (' + $fmt(S.lifetimeRun) + ' so far)') +
+    '</div></div></div>' +
+    (n >= 1 ? '<div style="padding:0 2px"><button class="buyBtn primary" style="width:100%;padding:16px" data-rebrand="1">🌐 REBRAND +'+n+' ⭐</button></div>' : '');
+  h += '<h3 class="sec">Stats</h3><div class="card" style="display:block">';
+  const rows = [
+    ['Lifetime earnings', $fmt(S.lifetime)],
+    ['This run', $fmt(S.lifetimeRun)],
+    ['Income/sec', $fmt(perSec())],
+    ['Businesses owned', totalOwned()],
+    ['Taps', S.taps.toLocaleString()],
+    ['Trophies', achCount() + '/' + ACH.length],
+    ['Rebrands', S.rebrands],
+    ['Time played', fmtTime(S.playTime)],
+  ];
+  rows.forEach(r => { h += '<div class="statRow"><span>' + r[0] + '</span><b>' + r[1] + '</b></div>'; });
+  h += '</div><button class="dangerBtn" data-reset="1">Reset all progress</button>';
+  document.getElementById('view').innerHTML = h;
+}
+function fmtTime(sec){
+  sec = Math.floor(sec);
+  const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
+  if(h) return h + 'h ' + m + 'm';
+  if(m) return m + 'm ' + s + 's';
+  return s + 's';
+}
+function render(){
+  document.querySelectorAll('#tabs button').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === S.tab));
+  if(S.tab === 'biz') renderBiz();
+  else if(S.tab === 'upg') renderUpg();
+  else if(S.tab === 'ach') renderAch();
+  else renderEmp();
+  updateHeader();
+}
+
+/* ================= EVENTS ================= */
+document.getElementById('hustle').addEventListener('pointerdown', e => {
+  const r = document.getElementById('hustleWrap').getBoundingClientRect();
+  doTap(e.clientX - r.left - 10, e.clientY - r.top - 10);
+});
+document.getElementById('view').addEventListener('click', e => {
+  const buy = e.target.closest('[data-buy]');
+  if(buy){ buyBusiness(buy.dataset.buy); return; }
+  const upg = e.target.closest('[data-upg]');
+  if(upg){ buyUpgrade(upg.dataset.upg); return; }
+  const bm = e.target.closest('[data-buymode]');
+  if(bm){ S.buyMode = bm.dataset.buymode === 'max' ? 'max' : parseInt(bm.dataset.buymode, 10); save(); render(); return; }
+  if(e.target.closest('[data-rebrand]')){ doRebrand(); return; }
+  if(e.target.closest('[data-reset]')){ hardReset(); return; }
+});
+document.getElementById('tabs').addEventListener('click', e => {
+  const t = e.target.closest('[data-tab]');
+  if(t){ S.tab = t.dataset.tab; save(); render(); }
+});
+document.getElementById('muteBtn').addEventListener('click', () => {
+  S.muted = !S.muted;
+  document.getElementById('muteBtn').textContent = S.muted ? '🔇' : '🔊';
+  save();
+});
+document.addEventListener('visibilitychange', () => { if(document.hidden) save(); });
+window.addEventListener('beforeunload', save);
+
+/* ================= LOOP ================= */
+let lastTick = Date.now();
+setInterval(() => {
+  const now = Date.now();
+  const dt = Math.min(5, (now - lastTick) / 1000);
+  lastTick = now;
+  const gain = perSec() * dt;
+  if(gain > 0) addCash(gain);
+  S.playTime += dt;
+  checkAch();
+  updateHeader();
+}, 100);
+setInterval(save, 10000);
+setInterval(() => { if(S.tab === 'biz') renderBiz(); }, 1000);
+
+/* ================= INIT ================= */
+load();
+document.getElementById('muteBtn').textContent = S.muted ? '🔇' : '🔊';
+(function offline(){
+  const elapsed = (Date.now() - (S.lastSeen || Date.now())) / 1000;
+  if(elapsed > 120){
+    const gain = Math.min(elapsed, 8*3600) * perSec() * 0.5;
+    if(gain >= 1){
+      addCash(gain);
+      setTimeout(() => showModal(
+        '<h2>💤 Welcome back!</h2><p>Your empire earned while you were away:</p>' +
+        '<div class="big">' + $fmt(gain) + '</div>',
+        [{label:'Collect', cls:'primary', fn:null}]
+      ), 600);
+    }
+  }
+})();
+render();
+</script>
+</body>
+</html>
